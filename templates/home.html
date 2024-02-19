@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body{
+                margin: 0;
+                padding: 0;
+            }
+
+            .top_image {
+                background-image: url('static/Network-Security-Monitoring-A-Complete-Guide.jpg');
+                height: 40vh;
+                background-size: cover;
+                background-repeat: no-repeat;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1; /* Set a higher z-index to make sure it appears above other elements */
+            }
+
+
+            .content{
+                margin-top: 5vh;
+                margin-left: 2vw;
+                display: flex;
+                margin-bottom: 10vh;
+            }
+            
+            .left{
+                margin: 0;
+                margin-top: 48vh;
+                width: 17vw;
+                position: fixed;
+                text-align: center;
+            }
+
+            .right{
+                margin-left: 20vw;
+                margin-top: 40vh;
+                margin-right: 3vw;
+            }
+
+            .content img{
+                height: 20vh;
+                display: flex;
+                justify-content: center;
+            }
+
+            .left button{
+                padding: 2vh;
+                width: 10vw;
+                background-color: #242E52;
+                color: white;
+                border-radius: 1vh;
+            }
+
+            .left button:hover{
+                background-color: #5b6a9f;
+            }            
+
+            .top_text{
+                color: white;
+                font-size: 9vh;
+                margin-top: 12vh;
+            }
+
+            .top_text p{
+                font-size: 2vh;
+                margin-left: 80%;
+                color: white;
+            }
+
+            .topic{
+                padding: 0;
+                margin: 0;
+                position: fixed;
+                margin-top: 3vh;
+                margin-left: 5vw;
+            }
+            
+        </style>
+    </head>
+
+    <body>
+        <div class="top_image">
+            <div class="top_text">
+                <h4 class = "topic">Hill Cipher</h4>
+                <p>IS IA by</p>
+                <p>- Chirag Sharma (16010121186)</p>
+                <p>- Uditi Sinha (16010121194)</p>
+                <p>- Chhavi Gupta (16010121218)</p>
+            </div>
+        </div>
+        <div class="content">
+            <div class="right">
+                <h1>History</h1>
+                Since the early days, ciphers were a common concept when it came to delivering secret messages. Several methods have emerged over the years, in the history of cryptography, that built the foundation for modern algorithms. Despite these advancements, Hill Cipher has proven to be a simple and unique way for hiding messages in plain sight.
+                <br><br>
+                <h1>Encryption</h1>
+                As an example of the Hill Cipher technique, let’s encrypt the text, ‘ACT’, and, later, decrypt the resulting ciphertext. This will help us understand how the Hill Cipher works.
+                To keep the example simple, here is a straightforward substitution scheme with the letter A mapped to 0, B mapped to 1, and so on and so forth.
+                <br><br>
+                <img src = "static\image003.jpg"/>
+                <br><br><br>
+                ‘ACT’ is written in the form of the following vector:
+                <br><br>
+                <img src = "static\image005.png"/>
+                <br><br><br>
+                The resulting enciphered vector will be:
+                <br><br>
+                <img src = "static\image007.jpg"/>
+                <br><br>
+                This results in the ciphertext of ‘POH’.
+                <br><br>
+                <h1>Decryption</h1>
+                For the purpose of decryption, the ciphertext will have to be turned back into a vector. Simply, multiply it by the inverse matrix of the key matrix (IFKVIVVMI in letters). The inverse of the matrix will be:
+                <br><br>
+                <img src = "static\image009-768x259.png"/>
+                <br><br><br>
+                For the previous Ciphertext ‘POH’, multiplying it with the inverse matrix gives:
+                <br><br>
+                <img src = "static\image011-768x259.png"/>
+                <br><br><br>
+                The output vector gives back ‘ACT’.
+            </div>
+            <div class="left">
+                Encrypt some text
+                <br><br>
+                <form action="/encrypt" method="GET">
+                    <button type="submit">Encrypt</button>
+                </form>
+                <br><br><br>
+                
+                Decrypt some text
+                <br><br>
+                <form action="/decrypt" method="GET">
+                    <button type="submit">Decrypt</button>
+                </form>
+                <br>
+            </div>
+        </div>
+    </body>
+</html>

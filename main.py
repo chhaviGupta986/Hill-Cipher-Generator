@@ -1,9 +1,13 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, url_for, redirect, session
 import string
 import numpy as np
 import math
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import data_required
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "secret"
 
 special="!@#$%^&*()_+-=~`<>?,./:\";'[]{}\| " #special characters
 valid=string.ascii_uppercase+string.digits+special
@@ -114,8 +118,9 @@ def encrypt(keyword,text):
     key_arr_numeric=convert_to_numeric_key_array(key_arr)
     text_arr_numeric=convert_to_numeric_text_arr(text_arr)
     isvalidkey, message =check_determinant_of_encryption_key(key_arr_numeric)
+    encrypted = ""
     if not isvalidkey:
-        exit(1)
+        return encrypted,message
     result=multiply(key_arr_numeric, text_arr_numeric)
     char_arr=convert_to_chars(result)
     char_arr=char_arr.T
@@ -184,30 +189,108 @@ def decrypt(keyword,cipher):
 
 @app.route('/')
 def get_response():
-    return jsonify({'message': 'Hello, World!'})
+    return render_template("home.html")
 
-@app.route('/encrypt', methods=['POST'])
-def encrypt_route():
-    data = request.get_json()
-    key = data['key']
-    plaintext = data['plaintext']
-    encrypted, message = encrypt(key, plaintext)
-    if message!="Determinant Invalid. Please try a different key":
-        return jsonify({"Encrypted Text": encrypted, "Message": message})
+class EncryptionForm(FlaskForm):
+    keyword = StringField("Enter the keyword to be used: ")
+    text = StringField("Enter the text to be encrytped: ")
+    submit = SubmitField("Submit")
+
+class DecryptionForm(FlaskForm):
+    keyword = StringField("Enter the keyword to be used: ")
+    cipher = StringField("Enter the text to be decrypted: ")
+    submit = SubmitField("Submit")
+
+@app.route('/encrypt', methods=['GET', 'POST'])
+def encrypting():
+    keyword = None
+    text = None
+    form = EncryptionForm()
+
+    if form.validate_on_submit():
+        keyword = form.keyword.data
+        form.keyword.data = ''
+        
+        text = form.text.data
+        form.text.data = ''
+
+        encrypted_text = encrypt(keyword, text)
+        session['encrypted_text'] = encrypted_text  # Store in session
+        session['original_text'] = text  # Store in session
+        session['keyword'] = keyword  # Store in session
+        print(encrypted_text)
+        return redirect(url_for('result'))
+        
+    return render_template("encrypt.html", keyword=keyword, text=text, form=form)
+
+
+@app.route('/decrypt', methods=['GET', 'POST'])
+def decrypting():
+    keyword = None
+    cipher = None
+    form = DecryptionForm()
+
+    if form.validate_on_submit():
+        keyword = form.keyword.data
+        form.keyword.data = ''
+        
+        cipher = form.cipher.data
+        form.cipher.data = ''
+
+        decrypted_text = decrypt(keyword, cipher)
+        session['encrypted_text'] = decrypted_text  # Store in session
+        session['original_text'] = cipher  # Store in session
+        session['keyword'] = keyword  # Store in session
+        print(decrypted_text)
+        return redirect(url_for('result'))
+        
+    return render_template("decrypt.html", keyword=keyword, cipher=cipher, form=form)
+
+
+
+@app.route('/result')
+def result():
+    encrypted_text = session.pop('encrypted_text', None)  # Retrieve from session
+    temp = encrypted_text[1]
+
+    if temp != 'Determinant Invalid. Please try a different key':
+        encrypted_text1 = encrypted_text[0]
     else:
-        return jsonify({"Message": message})
+        encrypted_text1 = ''
 
-@app.route('/decrypt', methods=['POST'])
-def decrypt_route():
-    data = request.get_json()
-    key = data['key']
-    cipher = data['cipher']
-    decrypted, message = decrypt(key, cipher)
-
-    if message!="Inverse does not exist: Decryption not possible with this key, try a diff key":
-        return jsonify({"Encrypted Text": decrypted})
+    if temp == 'Determinant Invalid. Please try a different key':
+        encrypted_text2 = temp
     else:
-        return jsonify({"Message": message})
+        encrypted_text2 = ''
+
+    original_text = session.pop('original_text', None)
+    keyword = session.pop('keyword', None)
+
+    if request.method == 'POST':
+        return render_template("home.html")
+    
+    return render_template("result.html", encrypted_text1=encrypted_text1, encrypted_text2=encrypted_text2, keyword = keyword, original_text=original_text)
+
+
+# @app.route('/encrypt', methods=['POST'])
+# def encrypt_route():
+#     data = request.get_json()
+#     key = data['key']
+#     plaintext = data['plaintext']
+#     encrypted, message = encrypt(key, plaintext)
+#     return render_template("encrypt.html", encrypted=encrypted, message=message)
+
+# @app.route('/decrypt', methods=['POST'])
+# def decrypt_route():
+#     data = request.get_json()
+#     key = data['key']
+#     cipher = data['cipher']
+#     decrypted, message = decrypt(key, cipher)
+
+#     if message!="Inverse does not exist: Decryption not possible with this key, try a diff key":
+#         return jsonify({"Encrypted Text": decrypted})
+#     else:
+#         return jsonify({"Message": message})
 
 
 if __name__ == '__main__':

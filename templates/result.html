@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body{
+                margin: 0;
+                padding: 0;
+            }
+
+            .top_image {
+                background-image: url('static/Network-Security-Monitoring-A-Complete-Guide.jpg');
+                height: 40vh;
+                background-size: cover;
+                background-repeat: no-repeat;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1; /* Set a higher z-index to make sure it appears above other elements */
+            }
+
+
+            .content{
+                margin-top: 5vh;
+                margin-left: 2vw;
+                display: flex;
+                margin-bottom: 10vh;
+            }
+            
+            .left{
+                margin: 0;
+                margin-top: 48vh;
+                width: 17vw;
+                position: fixed;
+                text-align: center;
+            }
+
+            .content img{
+                height: 20vh;
+            }
+
+            .left button{
+                padding: 2vh;
+                width: 10vw;
+                background-color: #242E52;
+                color: white;
+                border-radius: 1vh;
+            }
+
+            .left button:hover{
+                background-color: #5b6a9f;
+            }
+
+            .right {
+                display: flex;
+                flex-direction: column; /* Stack elements vertically */
+                align-items: center; /* Center items horizontally */
+                margin: auto;
+                margin-top: 45vh;
+                width: 65vw;
+                margin-left: 20vw;
+                margin-right: 3vw;
+            }
+
+            .right .inputs {
+                display: flex;
+            }
+
+            .right .inputs > * {
+                margin: 0 1vw; /* Add margin between inputs */
+            }
+
+            .right button {
+                padding: 2vh;
+                width: 10vw;
+                background-color: #242E52;
+                color: white;
+                border-radius: 1vh;
+                margin-top: 5vh; /* Add some top margin to the button */
+            }
+
+            .right button:hover {
+                background-color: #5b6a9f;
+            }
+
+            .right input {
+                padding: 1.5vh;
+                width: 20vw;
+                border-radius: 1vh;
+                border-style: solid;
+                border-width: 0.5vh;
+                border-color: #242E52;
+            }
+
+            .right p{
+                padding: 0;
+                margin: 0;
+                margin-bottom: 4vh;
+                font-size: 6vh;
+            }
+
+            .flex{
+                display: flex;
+            }
+
+            .top_text{
+                color: white;
+                font-size: 9vh;
+                margin-top: 12vh;
+            }
+
+            .top_text p{
+                font-size: 2vh;
+                margin-left: 80%;
+                color: white;
+            }
+
+            .topic{
+                padding: 0;
+                margin: 0;
+                position: fixed;
+                margin-top: 3vh;
+                margin-left: 5vw;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <div class="top_image">
+            <div class="top_text">
+                <h4 class = "topic">Hill Cipher</h4>
+                <p>IS IA by</p>
+                <p>- Chirag Sharma (16010121186)</p>
+                <p>- Uditi Sinha (16010121194)</p>
+                <p>- Chhavi Gupta (16010121218)</p>
+            </div>
+        </div>
+        <div class="content">
+            <form method="POST">
+                <form method = "POST">
+                <div class="right">  
+                    {% if encrypted_text1 != '' %}
+                        <h1>Resultant Text: </h1><p>{{ encrypted_text1 }}</p>
+                    {% endif %}
+                    {% if encrypted_text2 != '' %}
+                        <h4>Message: </h4>{{ encrypted_text2 }}
+                    {% endif %}
+                    <div class="flex">
+                        <h4 style = "margin-right: 5vw;">Keyword Used: {{ keyword }}</h4>
+                        <h4>Original Text: {{ original_text }}</h4>
+                    </div>
+                </form>
+                </div>
+            </form>                 
+            
+
+            <div class="left">
+                Encrypt some text
+                <br><br>
+                <form action="/encrypt" method="GET">
+                    <button type="submit">Encrypt</button>
+                </form>
+                <br><br><br>
+                
+                Decrypt some text
+                <br><br>
+                <form action="/decrypt" method="GET">
+                    <button type="submit">Decrypt</button>
+                </form>
+                <br>
+            </div>
+        </div>
+    </body>
+</html>
