@@ -39,7 +39,7 @@
                 display: flex;
                 margin: auto;
                 width: 60vw;
-                margin-top: 55vh;
+                margin-top: 40vh;
                 margin-right: 3vw;
             }
 
@@ -56,7 +56,7 @@
             }
 
             .left button:hover{
-                background-color: #5b6a9f;
+                background-color: #04091b;
             }
 
             .right {
@@ -64,9 +64,9 @@
                 flex-direction: column; /* Stack elements vertically */
                 align-items: center; /* Center items horizontally */
                 margin: auto;
-                width: 75vw;
+                width: 70vw;
+                margin-top: 40vh;
                 margin-left: 20vw;
-                margin-top: 55vh;
                 margin-right: 3vw;
             }
 
@@ -85,10 +85,17 @@
                 color: white;
                 border-radius: 1vh;
                 margin-top: 5vh; /* Add some top margin to the button */
+                margin-bottom: 2vh;
+            }
+
+            .right p{
+                padding: 0;
+                margin: 0;
+                color: #404d7c;
             }
 
             .right button:hover {
-                background-color: #5b6a9f;
+                background-color: #04091b;
             }
 
             .right input {
@@ -136,6 +143,7 @@
             <form method="POST">
                 <form method = "POST">
                 <div class="right">  
+                    <h1>Encrypt</h1>
                     <div class="class1">
                     {{ form.hidden_tag() }}
                     {{ form.keyword.label }}
@@ -148,6 +156,7 @@
                     </div>
 
                     <button type="submit">Submit</button>
+                    <p>Note: Avoid using keywords whose length is not a square number</p>
                 </form>
                 </div>
             </form>                 
