@@ -154,15 +154,16 @@ def create_decrypt_key(keyword):
         key_arr_numeric=convert_to_numeric_key_array(key_arr)
         det = round_off(np.linalg.det(key_arr_numeric))
         message = ""
+        arr=[["-"]]
         if det < 0:
             det = det % (total_chars)
         elif det==0:
             # print("Decryption wont work with this keyword, pls try again with diff key")
             message = "Decryption wont work with this keyword, please try again with different key."
-            return -1, message
+            return arr, message
         det_inv, message = mod_inverse(det,total_chars)
         if det_inv==-1:
-            return -1,message
+            return arr,message
 
         #modular multiplicative inverse
         #refer: https://www.youtube.com/watch?v=JK3ur6W4rvw&ab_channel=NesoAcademy
@@ -173,11 +174,11 @@ def create_decrypt_key(keyword):
             * np.linalg.inv(key_arr_numeric)
         )
         inv_key=convert_to_mod_valid(inv_key) 
-        return round_off(inv_key)[0][0], message 
+        return round_off(inv_key), message 
         
 def decrypt(keyword, cipher):
     dec_key, message = create_decrypt_key(keyword)
-    if dec_key == -1:  # Check if any element in the array is -1
+    if dec_key[0][0] == "-":  # Check if any element in the array is -1
         return "", message
     
     cipher_arr = convert_text_to_word_matrix(keyword, cipher)
