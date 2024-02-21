@@ -175,24 +175,21 @@ def create_decrypt_key(keyword):
         )
         inv_key=convert_to_mod_valid(inv_key) 
         return round_off(inv_key), message 
-        
-def decrypt(keyword, cipher):
-    dec_key, message = create_decrypt_key(keyword)
-    if dec_key[0][0] == "-":  # Check if any element in the array is -1
+
+def decrypt(keyword,cipher):
+    dec_key, message =create_decrypt_key(keyword)
+    if dec_key == -1:
         return "", message
-    
-    cipher_arr = convert_text_to_word_matrix(keyword, cipher)
-    cipher_arr_numeric = convert_to_numeric_text_arr(cipher_arr)
-    result = multiply(dec_key, cipher_arr_numeric)
-    result = round_off(result)
-    result = convert_to_mod_valid(result)
-    char_arr = convert_to_chars(result)
-    char_arr = char_arr.T
-    # decrypted = "".join(char_arr.flatten())  # Join flattened array of characters
+    cipher_arr=convert_text_to_word_matrix(keyword,cipher)
+    cipher_arr_numeric=convert_to_numeric_text_arr(cipher_arr)
+    result=multiply(dec_key, cipher_arr_numeric)
+    result=round_off(result)
+
+    result=convert_to_mod_valid(result)
+    char_arr=convert_to_chars(result)
+    char_arr=char_arr.T
     decrypted=""
-    # Remove any padding added during encryption
-    # decrypted = decrypted.rstrip('/0')  # Assuming '0' was used for padding
-        #below for loop is for converting 2d matrix to string
+    #below for loop is for converting 2d matrix to string
     for i in char_arr: 
         for j in i:
             decrypted+=j
