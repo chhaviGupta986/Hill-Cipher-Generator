@@ -142,7 +142,7 @@ def mod_inverse(a, m):
     message = ""
     if gcd != 1:
         # raise ValueError("Inverse does not exist")
-        message = "Inverse does not exist: Decryption not possible with this key, try a diff key"
+        message = "Inverse does not exist: Decryption not possible with this key, try a different key"
         # print("Inverse does not exist")
         # print("Decryption not possible with this key, try a diff key")
         # exit(1)
@@ -158,7 +158,7 @@ def create_decrypt_key(keyword):
             det = det % (total_chars)
         elif det==0:
             # print("Decryption wont work with this keyword, pls try again with diff key")
-            message = "Decryption wont work with this keyword, pls try again with diff key"
+            message = "Decryption wont work with this keyword, please try again with different key."
             return -1, message
         det_inv, message = mod_inverse(det,total_chars)
         if det_inv==-1:
@@ -220,12 +220,11 @@ def encrypting():
         
         text = form.text.data
         form.text.data = ''
-
+        
         encrypted_text = encrypt(keyword, text)
         session['encrypted_text'] = encrypted_text  # Store in session
         session['original_text'] = text  # Store in session
         session['keyword'] = keyword  # Store in session
-        print(encrypted_text)
         return redirect(url_for('result'))
         
     return render_template("encrypt.html", keyword=keyword, text=text, form=form)
@@ -248,7 +247,6 @@ def decrypting():
         session['encrypted_text'] = decrypted_text  # Store in session
         session['original_text'] = cipher  # Store in session
         session['keyword'] = keyword  # Store in session
-        print(decrypted_text)
         return redirect(url_for('result'))
         
     return render_template("decrypt.html", keyword=keyword, cipher=cipher, form=form)
@@ -260,12 +258,16 @@ def result():
     encrypted_text = session.pop('encrypted_text', None)  # Retrieve from session
     temp = encrypted_text[1]
 
-    if temp != 'Determinant Invalid. Please try a different key':
+    if temp != 'Determinant Invalid. Please try a different key' or "Decryption wont work with this keyword, please try again with different key." or "Inverse does not exist: Decryption not possible with this key, try a different key":
         encrypted_text1 = encrypted_text[0]
     else:
         encrypted_text1 = ''
 
     if temp == 'Determinant Invalid. Please try a different key':
+        encrypted_text2 = temp
+    elif temp == "Decryption wont work with this keyword, please try again with different key.":
+        encrypted_text2 = temp
+    elif temp == "Inverse does not exist: Decryption not possible with this key, try a different key":
         encrypted_text2 = temp
     else:
         encrypted_text2 = ''
