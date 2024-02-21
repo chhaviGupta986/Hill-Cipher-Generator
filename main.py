@@ -124,9 +124,9 @@ def encrypt(keyword,text):
     result=multiply(key_arr_numeric, text_arr_numeric)
     char_arr=convert_to_chars(result)
     char_arr=char_arr.T
-    flat_char_arr = char_arr.flatten()
-    encrypted = ''.join(str(ch) for ch in flat_char_arr)
-    # encrypted=char_arr.tobytes().decode('utf-8') #converting char arr to string
+    # flat_char_arr = char_arr.flatten()
+    # encrypted = ''.join(str(ch) for ch in flat_char_arr)
+    encrypted=char_arr.tobytes().decode('utf-8') #converting char arr to string
     return encrypted, message
 
 def extended_gcd(a, b):
@@ -173,11 +173,11 @@ def create_decrypt_key(keyword):
             * np.linalg.inv(key_arr_numeric)
         )
         inv_key=convert_to_mod_valid(inv_key) 
-        return round_off(inv_key), message 
+        return round_off(inv_key)[0][0], message 
         
 def decrypt(keyword, cipher):
     dec_key, message = create_decrypt_key(keyword)
-    if (dec_key == -1).any():  # Check if any element in the array is -1
+    if dec_key == -1:  # Check if any element in the array is -1
         return "", message
     
     cipher_arr = convert_text_to_word_matrix(keyword, cipher)
@@ -187,10 +187,14 @@ def decrypt(keyword, cipher):
     result = convert_to_mod_valid(result)
     char_arr = convert_to_chars(result)
     char_arr = char_arr.T
-    decrypted = "".join(char_arr.flatten())  # Join flattened array of characters
-    
+    # decrypted = "".join(char_arr.flatten())  # Join flattened array of characters
+    decrypted=""
     # Remove any padding added during encryption
-    decrypted = decrypted.rstrip('0')  # Assuming '0' was used for padding
+    # decrypted = decrypted.rstrip('/0')  # Assuming '0' was used for padding
+        #below for loop is for converting 2d matrix to string
+    for i in char_arr: 
+        for j in i:
+            decrypted+=j
     return decrypted, message
 
 @app.route('/')
