@@ -85,7 +85,7 @@
                 background-color: #242E52;
                 color: white;
                 border-radius: 1vh;
-                margin-top: 5vh; /* Add some top margin to the button */
+                margin-top: 2vh; /* Add some top margin to the button */
                 margin-bottom: 2vh;
             }
 
@@ -116,7 +116,9 @@
 
             .top_text p{
                 font-size: 2vh;
-                margin-left: 80%;
+                margin-top: 5vh;
+                margin-left: 70%;
+                margin-right: 5%;
                 color: white;
             }
 
@@ -134,10 +136,8 @@
         <div class="top_image">
             <div class="top_text">
                 <h4 class = "topic">Hill Cipher</h4>
-                <p>IS IA by</p>
-                <p>- Chirag Sharma (16010121186)</p>
-                <p>- Uditi Sinha (16010121194)</p>
-                <p>- Chhavi Gupta (16010121218)</p>
+                <p style="position: relative; font-family: Arial, Helvetica, sans-serif; font-weight: lighter;">Our website is dedicated to teaching the Hill Cipher algorithm in a user-friendly manner. With clear explanations and descriptive examples, you'll quickly grasp the fundamentals of encryption. Our platform allows you to encrypt and decrypt messages using the Hill Cipher algorithm, giving you hands-on experience with this powerful cryptographic technique. Whether you're a student, educator, or cryptography enthusiast, our site provides a straightforward way to understand and apply Hill Cipher for secure communication.</p>
+            
             </div>
         </div>
         <div class="content">
@@ -155,9 +155,10 @@
                     {{ form.cipher.label }}
                     {{ form.cipher() }}
                     </div>
-
+                    <p style="margin-top: 2%;">Sample input: Keyword= GYBNQKURP , Text= POH</p>
                     <button type="submit">Submit</button>
                     <p>Note: Avoid using keywords whose length is not a square number</p>
+                    <p>Note: For demonstration purposes, we have only considered alphabetical inputs</p>
                 </form>
                 </div>
             </form>                 

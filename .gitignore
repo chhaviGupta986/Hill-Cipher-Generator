@@ -1,2 +1,7 @@
 .venv
 .__pycache__/
+emergency.py
+hill-cipher.py
+README.md
+requirements.txt
+__init__/

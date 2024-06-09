@@ -1,20 +1,18 @@
-from flask import Flask, request, jsonify, render_template, url_for, redirect, session
+from flask import Flask, request,  render_template, url_for, redirect, session
 import string
 import numpy as np
 import math
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from wtforms.validators import data_required
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "secret"
-
 special="!@#$%^&*()_+-=~`<>?,./:\";'[]{}\| " #special characters
-valid=string.ascii_uppercase+string.digits+special
+# valid=string.ascii_uppercase+string.digits+special
 #valid= set of all possible characters including alphabets, digits, and special characters
 #user not restricted to enter only alphabets, they may enter anything
 
-# valid=string.ascii_uppercase #can uncomment for testing 
+valid=string.ascii_uppercase #can uncomment for testing 
 #(to tally output with gfg bcus they considered only alphabets)
 
 total_chars=len(valid)
@@ -36,6 +34,7 @@ def convert_keyword_to_word_matrix(keyword):
     sqr=n*n
     add=keyword[-1]*(sqr-keylen) #this is the padding that we will add to the keyword
     #to make its length equal to closest square number i.e. sqr
+    # print("debug..adding",add," to make it of size",sqr)
     keyword_copy=(keyword+add) #modifying copy of keyword not keyword directly
     #bcus user input should not be directly modified (bad practice)
     key_arr=[ch for ch in keyword_copy] #converting string into list of characters
@@ -55,7 +54,11 @@ def convert_text_to_word_matrix(keyword,text):
         #padding needed if text length is too short 
         #(smaller than batch size or not a multiple of batch size)
         pad=(n-rem)
-        text_copy=text+('0'*pad) #padding with zeroes, can pad with anything
+        text_copy=text+('z'*pad) #padding with zeroes, can pad with anything
+        '''
+        DONT PAD WITH 0..DO Z INSTEAD, BECAUSE IT CAUSES ERROR WHEN
+        ACCEPTABLE CHARACTER SET IS ONLY ALPHABETS!!!
+        '''
 
     else:
         text_copy=text    
@@ -72,15 +75,30 @@ def convert_text_to_word_matrix(keyword,text):
 #the 'fxn1' gets performed on each element of the matrix
 #thats all, no big deal.
 convert_to_mod_valid=np.vectorize(lambda x:x%total_chars)
-convert_to_numeric=np.vectorize(lambda x:valid.index(x))
+def convert_to_numeric(x):
+    # print("hi, valid=",valid)
+    # print(f"entered convert_to_numeric with x= {x}")
+    try:
+        return valid.index(x)
+    except ValueError:
+        # print(f"ouch,error: {ValueError}\n")
+        # Handle the case where the character is not found in the valid string
+        return -1  # Or any other suitable handling mechanism
+
+convert_to_numeric = np.vectorize(convert_to_numeric)
+
+
+# convert_to_numeric=np.vectorize(lambda x:valid.index(x))
 convert_to_chars=np.vectorize(lambda x:valid[x])
 round_off=np.vectorize(lambda x:int(np.rint(x)))
 
 def convert_to_numeric_key_array(key_arr):
+    # print("inside convert_to_numeric_key_array..with key_arr=",key_arr)
     key_arr_numeric=convert_to_numeric(key_arr)
+    # print("key_arr_numeric\n",key_arr_numeric)
     return key_arr_numeric
-
 def convert_to_numeric_text_arr(text_arr):
+    # print("inside convert_to_numeric_text_array..with text_arr=",text_arr)
     text_arr_numeric=convert_to_numeric(text_arr)
     #transposing to make it a column matrix
     text_arr_numeric=text_arr_numeric.T
@@ -89,46 +107,58 @@ def convert_to_numeric_text_arr(text_arr):
 def check_determinant_of_encryption_key(key_arr_numeric):
     
     det=np.linalg.det(key_arr_numeric)
-    det=int(det)
+    det=round(det)
     if det<0:
         det=det%total_chars #if negative det, then mod it n make it positive
     #Rule:
         #The determinant of the encryption key matrix should be relatively prime 
         #to the length of valid character set. i.e. total_chars variable
     #Hence check gcd
-    # print(det,total_chars)
     if math.gcd(det,total_chars)!=1:
-        message = "Determinant Invalid. Please try a different key"
-        # print(message)  # Print the message
+        print("if gcd not 1...det=",det)
+        message = "Determinant not co-prime to 26. Please try a different key"
         return False, message
     else:
         mod_inverse(det,total_chars)
         message = "Encryption can proceed with this key"
-        # print(message)  # Print the message
         return True, message
     
 def multiply(key_arr_numeric, text_arr_numeric):
+    # print(f"debug...entered multiply with key_arr_numeric={key_arr_numeric} n text_Arr_numeric={text_arr_numeric}")
     result=np.dot(key_arr_numeric,text_arr_numeric)
     result=convert_to_mod_valid(result)
     return result
 
 def encrypt(keyword,text):
-    key_arr=convert_keyword_to_word_matrix(keyword)
-    text_arr=convert_text_to_word_matrix(keyword,text)
-    key_arr_numeric=convert_to_numeric_key_array(key_arr)
-    text_arr_numeric=convert_to_numeric_text_arr(text_arr)
-    isvalidkey, message =check_determinant_of_encryption_key(key_arr_numeric)
-    encrypted = ""
-    if not isvalidkey:
-        return encrypted,message
-    result=multiply(key_arr_numeric, text_arr_numeric)
-    char_arr=convert_to_chars(result)
-    char_arr=char_arr.T
-    # flat_char_arr = char_arr.flatten()
-    # encrypted = ''.join(str(ch) for ch in flat_char_arr)
-    encrypted=char_arr.tobytes().decode('utf-8') #converting char arr to string
-    return encrypted, message
+    try:
+        key_arr=convert_keyword_to_word_matrix(keyword)
+        text_arr=convert_text_to_word_matrix(keyword,text)
+        key_arr_numeric=convert_to_numeric_key_array(key_arr)
+        text_arr_numeric=convert_to_numeric_text_arr(text_arr)
 
+        isvalidkey, message =check_determinant_of_encryption_key(key_arr_numeric)
+        encrypted = ""
+        if not isvalidkey:
+            return encrypted,message
+        # result=multiply(key_arr_numeric, text_arr_numeric)
+    except:
+        message="Invalid input entered! Please check that there are only alphabets and no whitespaces in your input."
+        # print("some new error")
+        return "",message
+    try:
+        result=multiply(key_arr_numeric, text_arr_numeric)
+        char_arr=convert_to_chars(result)
+        char_arr=char_arr.T
+        # flat_char_arr = char_arr.flatten()
+        # encrypted = ''.join(str(ch) for ch in flat_char_arr)
+        encrypted=char_arr.tobytes().decode('utf-8') #converting char arr to string
+        return encrypted, message
+    except ValueError as v1:
+        # print("error v1 in multiply",v1)
+        return "", "Unexpected error"
+
+
+    
 def extended_gcd(a, b):
     if b == 0:
         return a, 1, 0
@@ -141,11 +171,7 @@ def mod_inverse(a, m):
     gcd, x, y = extended_gcd(a, m)
     message = ""
     if gcd != 1:
-        # raise ValueError("Inverse does not exist")
-        message = "Inverse does not exist: Decryption not possible with this key, try a different key"
-        # print("Inverse does not exist")
-        # print("Decryption not possible with this key, try a diff key")
-        # exit(1)
+        message = "Matrix not invertible, try a different key"
         return -1,message
     return x % m, message
 
@@ -153,12 +179,13 @@ def create_decrypt_key(keyword):
         key_arr=convert_keyword_to_word_matrix(keyword)
         key_arr_numeric=convert_to_numeric_key_array(key_arr)
         det = round_off(np.linalg.det(key_arr_numeric))
+        # print(f"inside create_Decrypt_key...det={det}")
         message = ""
         arr=[["-"]]
         if det < 0:
             det = det % (total_chars)
+            # print(f"inside if ..new det={det}")
         elif det==0:
-            # print("Decryption wont work with this keyword, pls try again with diff key")
             message = "Decryption wont work with this keyword, please try again with different key."
             return arr, message
         det_inv, message = mod_inverse(det,total_chars)
@@ -177,22 +204,42 @@ def create_decrypt_key(keyword):
         return round_off(inv_key), message 
 
 def decrypt(keyword,cipher):
-    dec_key, message =create_decrypt_key(keyword)
-    if dec_key == -1:
-        return "", message
-    cipher_arr=convert_text_to_word_matrix(keyword,cipher)
-    cipher_arr_numeric=convert_to_numeric_text_arr(cipher_arr)
-    result=multiply(dec_key, cipher_arr_numeric)
-    result=round_off(result)
+    try:
+        dec_key, message =create_decrypt_key(keyword)
+        if isinstance(dec_key, np.ndarray) and dec_key.shape == (1, 1):
+            dec_key = dec_key[0][0]  # Extract the single value from the array
+            if dec_key == -1:
+                return "", message
+        cipher_arr=convert_text_to_word_matrix(keyword,cipher)
+        cipher_arr_numeric=convert_to_numeric_text_arr(cipher_arr)
+    except ValueError as v:
+        # print(f"error in decrypting:{v}")
+        message="Invalid input entered! Please check that there are only alphabets and no whitespaces in your input."
+        return "",message
+    except:
+        message="Unexpected error"
+        # print("some new error")
+        return "",message
+    try:
+        result=multiply(dec_key, cipher_arr_numeric)
+    except ValueError as v1:
+        # print("error v1 in multiply",v1)
+        return "", "Matrix not invertible, try a different key"
+    try:
+        result=round_off(result)
 
-    result=convert_to_mod_valid(result)
-    char_arr=convert_to_chars(result)
-    char_arr=char_arr.T
-    decrypted=""
-    #below for loop is for converting 2d matrix to string
-    for i in char_arr: 
-        for j in i:
-            decrypted+=j
+        result=convert_to_mod_valid(result)
+        char_arr=convert_to_chars(result)
+        char_arr=char_arr.T
+        decrypted=""
+        #below for loop is for converting 2d matrix to string
+        for i in char_arr: 
+            for j in i:
+                decrypted+=j
+    except:
+        message="Unexpected error"
+        # print("some new error")
+        return "",message
     return decrypted, message
 
 @app.route('/')
@@ -259,16 +306,17 @@ def result():
     encrypted_text = session.pop('encrypted_text', None)  # Retrieve from session
     temp = encrypted_text[1]
 
-    if temp != 'Determinant Invalid. Please try a different key' or "Decryption wont work with this keyword, please try again with different key." or "Inverse does not exist: Decryption not possible with this key, try a different key":
+    if temp != 'Determinant not co-prime to 26. Please try a different key' or "Decryption wont work with this keyword, please try again with different key." or "Matrix not invertible, try a different key":
         encrypted_text1 = encrypted_text[0]
+        
     else:
         encrypted_text1 = ''
 
-    if temp == 'Determinant Invalid. Please try a different key':
+    if temp == 'Determinant not co-prime to 26. Please try a different key' or temp=='Unexpected error' or temp== "Invalid input entered! Please check that there are only alphabets and no whitespaces in your input.":
         encrypted_text2 = temp
     elif temp == "Decryption wont work with this keyword, please try again with different key.":
         encrypted_text2 = temp
-    elif temp == "Inverse does not exist: Decryption not possible with this key, try a different key":
+    elif temp == "Matrix not invertible, try a different key":
         encrypted_text2 = temp
     else:
         encrypted_text2 = ''
@@ -278,30 +326,7 @@ def result():
 
     if request.method == 'POST':
         return render_template("home.html")
-    
     return render_template("result.html", encrypted_text1=encrypted_text1, encrypted_text2=encrypted_text2, keyword = keyword, original_text=original_text)
-
-
-# @app.route('/encrypt', methods=['POST'])
-# def encrypt_route():
-#     data = request.get_json()
-#     key = data['key']
-#     plaintext = data['plaintext']
-#     encrypted, message = encrypt(key, plaintext)
-#     return render_template("encrypt.html", encrypted=encrypted, message=message)
-
-# @app.route('/decrypt', methods=['POST'])
-# def decrypt_route():
-#     data = request.get_json()
-#     key = data['key']
-#     cipher = data['cipher']
-#     decrypted, message = decrypt(key, cipher)
-
-#     if message!="Inverse does not exist: Decryption not possible with this key, try a diff key":
-#         return jsonify({"Encrypted Text": decrypted})
-#     else:
-#         return jsonify({"Message": message})
-
 
 if __name__ == '__main__':
     app.run()

@@ -69,7 +69,9 @@
 
             .top_text p{
                 font-size: 2vh;
-                margin-left: 80%;
+                margin-top: 5vh;
+                margin-left: 70%;
+                margin-right: 5%;
                 color: white;
             }
 
@@ -80,7 +82,6 @@
                 margin-top: 3vh;
                 margin-left: 5vw;
             }
-            
         </style>
     </head>
 
@@ -88,10 +89,7 @@
         <div class="top_image">
             <div class="top_text">
                 <h4 class = "topic">Hill Cipher</h4>
-                <p>IS IA by</p>
-                <p>- Chirag Sharma (16010121186)</p>
-                <p>- Uditi Sinha (16010121194)</p>
-                <p>- Chhavi Gupta (16010121218)</p>
+                <p style="position: relative; font-family: Arial, Helvetica, sans-serif; font-weight: lighter;">Our website is dedicated to teaching the Hill Cipher algorithm in a user-friendly manner. With clear explanations and descriptive examples, you'll quickly grasp the fundamentals of encryption. Our platform allows you to encrypt and decrypt messages using the Hill Cipher algorithm, giving you hands-on experience with this powerful cryptographic technique. Whether you're a student, educator, or cryptography enthusiast, our site provides a straightforward way to understand and apply Hill Cipher for secure communication.</p>
             </div>
         </div>
         <div class="content">
@@ -104,27 +102,58 @@
                 To keep the example simple, here is a straightforward substitution scheme with the letter A mapped to 0, B mapped to 1, and so on and so forth.
                 <br><br>
                 <img src = "static\image003.jpg"/>
-                <br><br><br>
+                <br><br>
                 ‘ACT’ is written in the form of the following vector:
                 <br><br>
                 <img src = "static\image005.png"/>
+                <!-- <br><br>
+                <i>
+                    The determinant of the encryption key matrix should be relatively prime 
+                    to the length of valid input character set (In our case, 26, since we are allowing only
+                    alphabets)
+                </i> -->
                 <br><br><br>
                 The resulting enciphered vector will be:
                 <br><br>
                 <img src = "static\image007.jpg"/>
                 <br><br>
-                This results in the ciphertext of ‘POH’.
+                This results in the ciphertext of ‘POH’.    
                 <br><br>
                 <h1>Decryption</h1>
                 For the purpose of decryption, the ciphertext will have to be turned back into a vector. Simply, multiply it by the inverse matrix of the key matrix (IFKVIVVMI in letters). The inverse of the matrix will be:
                 <br><br>
                 <img src = "static\image009-768x259.png"/>
+                <!-- <br><br>
+                <i>
+                    The key has to be chosen in such a way that there exists an inverse matrix for the key matrix because it would be impossible to decode the message otherwise. Therefore the determinant of the key matrix modulo 26 has to be co-prime to 26. Numbers co-prime to 26 are: 1,3,5,7,9,11,15,17,19,21,23,25. 
+                </i> -->
                 <br><br><br>
                 For the previous Ciphertext ‘POH’, multiplying it with the inverse matrix gives:
                 <br><br>
                 <img src = "static\image011-768x259.png"/>
                 <br><br><br>
                 The output vector gives back ‘ACT’.
+                <br>
+                <p style="border-color: #242E52; border-style: solid; 
+                padding: 1%; border-style: outset;">
+                    <i>
+                        Note: The key has to be chosen in such a way that there exists an inverse matrix for the key matrix because it would be impossible to decode the message otherwise. 
+                        Therefore the determinant of the encryption key matrix should be relatively prime 
+                        to the length of valid input character set (In our case, 26, since we are allowing only
+                        alphabets).
+                        <br>
+                        Therefore determinant of encryption key matrix modulo 26 has to be co-prime to 26. Numbers co-prime to 26 are: 1,3,5,7,9,11,15,17,19,21,23,25. 
+                    </i>
+                </p>
+                <br>
+                <h1>Security Considerations</h1>
+                The basic version of Hill cipher is vulnerable to known-plaintext attacks because the whole encryption process is linear. The intruder who intercepts n<sup>2</sup> 
+                pairs of plaintext and ciphertext corresponding letters can create a linear system which can be quite easily solved. Adding a few more pairs 
+                allows to choose a correct solution if more than one was discovered. Solving linear equations 
+                usually doesn't take much time.
+                <br><br>
+                In modern times, the Hill cipher is rarely used in practical applications due to its vulnerabilities and the availability of more secure encryption algorithms. However, it remains a valuable educational tool for understanding the principles of cryptography and matrix algebra.
+                <br><br>                 
             </div>
             <div class="left">
                 Encrypt some text
